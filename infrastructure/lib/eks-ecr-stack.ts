@@ -83,8 +83,8 @@ export class EksEcrStack extends Stack {
     },
     StringLike: {
      'token.actions.githubusercontent.com:sub': [
+      'repo:kenneth-de-guzman/*',
       'repo:kenneth-de-guzman/gitops-platform-aws/*',
-      'repo:kenneth-de-guzman/gitops-platform-aws',
      ],
     },
    }),
