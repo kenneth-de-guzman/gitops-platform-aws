@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib'
-import { GitopsPlatformAwsStack } from '../lib/gitops-platform-aws-stack'
 import { CommonNetworkStack } from '../lib/common-network-stack'
 import { EksEcrStack } from '../lib/eks-ecr-stack'
 import config from '../config'
