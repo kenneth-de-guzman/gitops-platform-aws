@@ -9,7 +9,11 @@ import {
  InstanceSize,
 } from 'aws-cdk-lib/aws-ec2'
 // import * as eks from 'aws-cdk-lib/aws-eks'
-import { Cluster, KubernetesVersion } from 'aws-cdk-lib/aws-eks'
+import {
+ Cluster,
+ KubernetesVersion,
+ AuthenticationMode,
+} from 'aws-cdk-lib/aws-eks'
 import * as iam from 'aws-cdk-lib/aws-iam'
 import * as ecr from 'aws-cdk-lib/aws-ecr'
 // import * as lambda from 'aws-cdk-lib/aws-lambda'
@@ -57,6 +61,7 @@ export class EksEcrStack extends Stack {
    defaultCapacity: 0, // We'll use managed node groups instead
    clusterName: `${config.app}-eks-cluster-${config.env}`,
    kubectlLayer: new KubectlV34Layer(this, 'kubectl'),
+   authenticationMode: AuthenticationMode.API_AND_CONFIG_MAP,
   })
 
   // Add Managed Node Group
