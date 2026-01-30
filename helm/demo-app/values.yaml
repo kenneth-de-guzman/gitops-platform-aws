@@ -1,0 +1,8 @@
+replicaCount: 1
+image:
+  repository: 695418593935.dkr.ecr.us-west-2.amazonaws.com/gitops-platform-aws-app-dev
+  tag: latest
+
+service:
+  type: LoadBalancer
+  port: 80

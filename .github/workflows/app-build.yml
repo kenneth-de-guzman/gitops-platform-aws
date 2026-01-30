@@ -1,0 +1,28 @@
+name: Build and Release Application
+
+on:
+  push:
+    paths:
+      - 'app/**'
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+      - run: |
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/demo-app:${{ github.sha }} .
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/demo-app:${{ github.sha}}
+      - run: |
+          cd helm/demo-app
+          yq e -i ".image.tag = \"${{ github.sha }}\"" values.yaml
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add values.yaml
+          git commit -m "Update image tag to ${{ github.sha }}"
+          git push origin HEAD:main
