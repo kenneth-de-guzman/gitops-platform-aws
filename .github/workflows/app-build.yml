@@ -14,7 +14,7 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: arn:aws:iam::695418593935:role/gitops-platform-aws-github-actions-role-dev
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       - run: |
           docker build -t ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/gitops-platform-aws-app-dev:${{ github.sha }} .
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
