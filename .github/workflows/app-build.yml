@@ -2,24 +2,42 @@ name: Build and Release Application
 
 on:
   workflow_dispatch:
-  env:
-    AWS_REGION: ap-southeast-2
-    AWS_ACCOUNT_ID: 695418593935
-  
+
+permissions:
+  id-token: write
+  contents: write
+
+env:
+  AWS_REGION: ap-southeast-2
+  AWS_ACCOUNT_ID: 695418593935
+
 jobs:
   build-push:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-      - run: |
-          docker build -t ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/gitops-platform-aws-app-dev:${{ github.sha }} .
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/gitops-platform-aws-app-dev:${{ github.sha}}
-      - run: |
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Build and Push Image
+        run: |
+          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/gitops-platform-aws-app-dev:${{ github.sha }} .
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/gitops-platform-aws-app-dev:${{ github.sha }}
+
+      - name: Update Helm Values
+        run: |
           cd helm/demo-app
           yq e -i ".image.tag = \"${{ github.sha }}\"" values.yaml
           git config user.name "GitHub Actions"
