@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 2
 image:
   repository: 695418593935.dkr.ecr.us-west-2.amazonaws.com/gitops-platform-aws-app-dev
   tag: 41b51941f48a152af48512e5fa2bf0ba5d6b52c8
