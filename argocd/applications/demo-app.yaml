@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/<your-username>/gitops-platform-aws
+    repoURL: https://github.com/kenneth-de-guzman/gitops-platform-aws
     targetRevision: main
     path: helm/demo-app
     helm:

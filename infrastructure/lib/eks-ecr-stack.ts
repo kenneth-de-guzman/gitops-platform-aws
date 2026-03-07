@@ -17,9 +17,10 @@ import {
 import * as iam from 'aws-cdk-lib/aws-iam'
 import * as ecr from 'aws-cdk-lib/aws-ecr'
 // import * as lambda from 'aws-cdk-lib/aws-lambda'
-// import * as path from 'path'
+// import * as path from 'psath'
 import config from '../config'
 import { KubectlV34Layer } from '@aws-cdk/lambda-layer-kubectl-v34'
+import { aws_ec2 as ec2 } from 'aws-cdk-lib'
 
 interface TagMap {
  [key: string]: string
@@ -50,14 +51,20 @@ export class EksEcrStack extends Stack {
   //    description: 'Lambda layer for EKS kubectl operations',
   //   })
 
+  const vpcId = ec2.Vpc.fromVpcAttributes(this, 'ExistingVPC', {
+   vpcId: config.vpc,
+   availabilityZones: ['ap-southeast-2a', 'ap-southeast-2b'],
+   publicSubnetIds: ['subnet-0cd63ac86ee73a3ba', 'subnet-0365280da780b1b27'],
+  })
+
+  const publicSubnets = vpc.selectSubnets({
+   subnetType: SubnetType.PUBLIC,
+  })
+
   const cluster = new Cluster(this, 'EksCluster', {
    version: KubernetesVersion.V1_28,
-   vpc,
-   vpcSubnets: [
-    {
-     subnetType: SubnetType.PRIVATE_WITH_EGRESS,
-    },
-   ],
+   vpc: vpcId,
+   vpcSubnets: [{ subnetType: SubnetType.PUBLIC }],
    defaultCapacity: 0, // We'll use managed node groups instead
    clusterName: `${config.app}-eks-cluster-${config.env}`,
    kubectlLayer: new KubectlV34Layer(this, 'kubectl'),
