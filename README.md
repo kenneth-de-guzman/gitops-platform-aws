@@ -25,6 +25,10 @@ This project implements a cloud-native GitOps workflow on AWS:
 - **GitOps**: ArgoCD automatically deploys and synchronizes applications from Git
 
 ---
+## Youtube Video
+
+[![Gitops Platform Demo](./gitops_demo.jpg)](https://youtu.be/qVa2lX-_EhQ)
+
 
 ## Infrastructure
 
